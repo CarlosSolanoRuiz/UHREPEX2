@@ -1,0 +1,92 @@
+/*
+	Crear base de datos UHReparaciones
+	Crear tablas
+		1.Equipos: EquipoID, TipoEquipo, Modelo, UsuarioID
+		2.Usuarios: UsuarioID, Nombre, CorreoElectronico, Telefono
+		3.Tecnicos: TecnicoID, Nombre, Especialidad
+		4.Asignaciones: AsignaciónID, ReparacionID, TecnicoID, FechaAsignacion
+		5.Reparaciones: ReparacionID, EquipoID, FechaSolicitud, Estado
+		6.DetallesReparacion: DetalleID, ReparacionID, Descripcion, FechaInicio, FechaFin
+*/
+
+CREATE DATABASE UHREPARACIONES
+GO
+
+USE UHREPARACIONES
+
+CREATE TABLE USUARIOS
+(
+	UsuarioID INT IDENTITY (1,1),
+	Nombre VARCHAR (50) NOT NULL,
+	CorreoElectronico VARCHAR (50),
+	Telefono VARCHAR (8),
+	CONSTRAINT pk_IdUsuario PRIMARY KEY (UsuarioID)
+)
+GO
+
+CREATE TABLE EQUIPOS
+(
+	EquipoID INT IDENTITY (100,1),
+	TipoEquipo VARCHAR (50) NOT NULL,
+	Modelo VARCHAR (50),
+	IdUsuario INT,
+	CONSTRAINT pk_IdEquipo PRIMARY KEY (EquipoID),
+	CONSTRAINT fk_IdUsuario FOREIGN KEY (IdUsuario) REFERENCES USUARIOS(UsuarioID)
+)
+GO
+
+CREATE TABLE TECNICOS
+(
+	TecnicoID INT IDENTITY (200,1),
+	TecnicoNombre VARCHAR (50) NOT NULL,
+	Especialidad VARCHAR (50),
+	CONSTRAINT pk_IDTecnico PRIMARY KEY (TecnicoID)
+)
+GO
+
+CREATE TABLE REPARACIONES
+(
+	ReparacionID INT IDENTITY (300,1),
+	EquipoID INT,
+	FechaSolicitud DATETIME CONSTRAINT df_FechaSolicitud DEFAULT GETDATE(),
+	Estado VARCHAR (20),
+	CONSTRAINT pk_IdReparacion PRIMARY KEY (ReparacionID),
+	CONSTRAINT fk_IdEquipo FOREIGN KEY (EquipoID) REFERENCES EQUIPOS(EquipoID)
+)
+GO
+
+CREATE TABLE ASIGNACIONES
+(
+	AsignacionID INT IDENTITY (400,1),
+	ReparacionID INT,
+	TecnicoID INT,
+	FechaAsignacion DATETIME CONSTRAINT df_FechaAsignacion DEFAULT GETDATE (),
+	CONSTRAINT pk_IdAsignacion PRIMARY KEY (AsignacionID),
+	CONSTRAINT fk_IdReparacion FOREIGN KEY (ReparacionID) REFERENCES REPARACIONES(ReparacionID),
+	CONSTRAINT fk_IdTecnico FOREIGN KEY (TecnicoID) REFERENCES TECNICOS(TecnicoID)
+)
+GO
+
+CREATE TABLE DETALLESREPARACION
+(
+	DetalleID INT IDENTITY (500,1),
+	ReparacionDetID INT,
+	Descripcion VARCHAR (100) NOT NULL,
+	FechaInicio DATETIME CONSTRAINT df_FechaInicio DEFAULT GETDATE(),
+	FechaFin DATETIME CONSTRAINT df_FechaFin DEFAULT GETDATE (),
+	CONSTRAINT pk_IdDetalle PRIMARY KEY (DetalleID),
+	CONSTRAINT fk_IdReparacionDet FOREIGN KEY (ReparacionDetID) REFERENCES REPARACIONES(ReparacionID)
+)
+GO
+
+INSERT INTO USUARIOS VALUES('Carlos Solano'),('Roberto Ruiz')
+
+/*
+	PROCEDIMIENTOS ALMACENADOS / STORE PROCEDURES / SP / PA
+*/
+
+CREATE PROCEDURE CONSULTA
+AS
+	BEGIN
+		SELECT * FROM USUARIOS
+	END
